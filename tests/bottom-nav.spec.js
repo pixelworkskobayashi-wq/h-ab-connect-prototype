@@ -177,3 +177,66 @@ test.describe('ボトムナビ固定テスト', () => {
   });
 
 });
+
+  // ─── 7. ナビの重複表示がないこと ──────────────────────
+  test('bottom-nav が画面内に1個だけ表示されている', async ({ page }) => {
+    // 全bottom-navのうち表示されているものを数える
+    const visibleNavs = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll('.bottom-nav'))
+        .filter(el => {
+          const s = window.getComputedStyle(el);
+          return s.display !== 'none' && s.visibility !== 'hidden';
+        }).length;
+    });
+    expect(visibleNavs, `表示中のbottom-nav数: ${visibleNavs}`).toBe(1);
+  });
+
+  test('各ページ遷移後もbottom-navは1個だけ表示される', async ({ page }) => {
+    const labels = ['講習会', 'CPD', '会員証', 'マイページ', 'ホーム'];
+    for (const label of labels) {
+      await navigateTo(page, label);
+      const visibleNavs = await page.evaluate(() => {
+        return Array.from(document.querySelectorAll('.bottom-nav'))
+          .filter(el => {
+            const s = window.getComputedStyle(el);
+            return s.display !== 'none' && s.visibility !== 'hidden';
+          }).length;
+      });
+      expect(visibleNavs, `[${label}] 表示中のbottom-nav数: ${visibleNavs}`).toBe(1);
+    }
+  });
+
+  // ─── 8. ヘッダーがスクロールで動かないこと ──────────
+  test('ホーム: 下スクロール後もヘッダーがphone上端に固定されている', async ({ page }) => {
+    const phoneBox = await page.locator('.phone').boundingBox();
+    const before = await page.locator('#screen-home .status-bar').boundingBox();
+
+    // 下にスクロール
+    await page.locator('#screen-home .body').evaluate(el => el.scrollBy(0, 300));
+    await page.waitForTimeout(400);
+
+    const after = await page.locator('#screen-home .status-bar').boundingBox();
+    expect(
+      Math.abs(after.y - before.y),
+      `スクロール前y=${Math.round(before.y)} / スクロール後y=${Math.round(after.y)}`
+    ).toBeLessThanOrEqual(2);
+  });
+
+  test('各ページ: スクロール後もヘッダーがphone上端に固定されている', async ({ page }) => {
+    const screenIds = ['screen-workshops', 'screen-cpd', 'screen-card', 'screen-mypage'];
+    const labels    = ['講習会', 'CPD', '会員証', 'マイページ'];
+
+    for (let i = 0; i < labels.length; i++) {
+      await navigateTo(page, labels[i]);
+      const before = await page.locator(`#${screenIds[i]} .status-bar`).boundingBox();
+
+      await page.locator(`#${screenIds[i]} .body`).evaluate(el => el.scrollBy(0, 300));
+      await page.waitForTimeout(400);
+
+      const after = await page.locator(`#${screenIds[i]} .status-bar`).boundingBox();
+      expect(
+        Math.abs(after.y - before.y),
+        `[${labels[i]}] スクロール前y=${Math.round(before.y)} / 後y=${Math.round(after.y)}`
+      ).toBeLessThanOrEqual(2);
+    }
+  });
