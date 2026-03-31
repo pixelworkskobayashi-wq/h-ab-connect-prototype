@@ -179,30 +179,20 @@ test.describe('ボトムナビ固定テスト', () => {
 });
 
   // ─── 7. ナビの重複表示がないこと ──────────────────────
-  test('bottom-nav が画面内に1個だけ表示されている', async ({ page }) => {
-    // 全bottom-navのうち表示されているものを数える
-    const visibleNavs = await page.evaluate(() => {
-      return Array.from(document.querySelectorAll('.bottom-nav'))
-        .filter(el => {
-          const s = window.getComputedStyle(el);
-          return s.display !== 'none' && s.visibility !== 'hidden';
-        }).length;
-    });
-    expect(visibleNavs, `表示中のbottom-nav数: ${visibleNavs}`).toBe(1);
+  test('bottom-nav がDOMに1個だけ存在する', async ({ page }) => {
+    const total = await page.locator('.bottom-nav').count();
+    expect(total, `DOM内のbottom-nav総数: ${total}`).toBe(1);
   });
 
-  test('各ページ遷移後もbottom-navは1個だけ表示される', async ({ page }) => {
+  test('共通ナビ(#shared-bottom-nav)が表示されている', async ({ page }) => {
+    await expect(page.locator('#shared-bottom-nav')).toBeVisible();
+  });
+
+  test('各ページ遷移後も共通ナビが表示されている', async ({ page }) => {
     const labels = ['講習会', 'CPD', '会員証', 'マイページ', 'ホーム'];
     for (const label of labels) {
       await navigateTo(page, label);
-      const visibleNavs = await page.evaluate(() => {
-        return Array.from(document.querySelectorAll('.bottom-nav'))
-          .filter(el => {
-            const s = window.getComputedStyle(el);
-            return s.display !== 'none' && s.visibility !== 'hidden';
-          }).length;
-      });
-      expect(visibleNavs, `[${label}] 表示中のbottom-nav数: ${visibleNavs}`).toBe(1);
+      await expect(page.locator('#shared-bottom-nav'), `[${label}] ナビが非表示`).toBeVisible();
     }
   });
 
