@@ -24,6 +24,8 @@
     box-shadow: 0 20px 60px rgba(0,0,0,0.18);
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
   @media (max-width: 420px) {
     body { padding: 0; background: #F4F7FB; align-items: stretch; }
@@ -34,8 +36,8 @@
   .screen {
     display: none;
     flex-direction: column;
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
+    flex: 1;
+    min-height: 0;
   }
   .screen.active { display: flex; }
 
@@ -74,16 +76,16 @@
   .hbadge b { font-weight: 600; }
 
   /* BODY */
-  .body { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 80px; -webkit-overflow-scrolling: touch; }
+  .body { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 20px; min-height: 0; -webkit-overflow-scrolling: touch; }
 
-  /* BOTTOM NAV */
+  /* BOTTOM NAV - .phone直下に1個だけ配置、常時固定 */
   .bottom-nav {
     background: #fff;
     border-top: 0.5px solid #D6E4F4;
     display: flex;
     padding: 8px 0 12px;
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
+    flex-shrink: 0;
+    position: relative;
     z-index: 100;
   }
   .nav-item {
@@ -384,30 +386,7 @@
           <div class="nsub">2026年3月28日</div>
         </div>
       </div>
-    </div>
-    <div class="bottom-nav">
-      <div class="nav-item active" onclick="go('screen-home')">
-        <svg viewBox="0 0 22 22" fill="none"><path d="M3 10.5L11 3L19 10.5V19H14V14H8V19H3V10.5Z" stroke="#1B4F8A" stroke-width="1.4" stroke-linejoin="round"/></svg>
-        <span>ホーム</span>
-      </div>
-      <div class="nav-item" onclick="go('screen-workshops')">
-        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="14" rx="2" stroke="#aaa" stroke-width="1.4"/><line x1="3" y1="9" x2="19" y2="9" stroke="#aaa" stroke-width="1.4"/><rect x="6" y="13" width="4" height="3" rx="0.5" fill="#aaa"/></svg>
-        <span>講習会</span>
-      </div>
-      <div class="nav-item" onclick="go('screen-cpd')">
-        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#aaa" stroke-width="1.4"/><polyline points="7,11 10,14 15,8" stroke="#aaa" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span>CPD</span>
-      </div>
-      <div class="nav-item" onclick="go('screen-card')">
-        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="2" stroke="#aaa" stroke-width="1.4"/><rect x="5" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="5" y="12" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="12" width="5" height="5" rx="0.5" fill="#aaa"/></svg>
-        <span>会員証</span>
-      </div>
-      <div class="nav-item" onclick="go('screen-mypage')">
-        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="#aaa" stroke-width="1.4"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#aaa" stroke-width="1.4" stroke-linecap="round"/></svg>
-        <span>マイページ</span>
-      </div>
-    </div>
-  </div>
+    </div></div>
 
   <!-- ===== SCREEN: WORKSHOPS ===== -->
   <div class="screen" id="screen-workshops">
@@ -513,30 +492,7 @@
           <button class="apply-btn full">締切</button>
         </div>
       </div>
-    </div>
-    <div class="bottom-nav">
-      <div class="nav-item" onclick="go('screen-home')">
-        <svg viewBox="0 0 22 22" fill="none"><path d="M3 10.5L11 3L19 10.5V19H14V14H8V19H3V10.5Z" stroke="#aaa" stroke-width="1.4" stroke-linejoin="round"/></svg>
-        <span>ホーム</span>
-      </div>
-      <div class="nav-item active" onclick="go('screen-workshops')">
-        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="14" rx="2" stroke="#1B4F8A" stroke-width="1.4"/><line x1="3" y1="9" x2="19" y2="9" stroke="#1B4F8A" stroke-width="1.4"/><rect x="6" y="13" width="4" height="3" rx="0.5" fill="#1B4F8A"/></svg>
-        <span style="color:#1B4F8A;">講習会</span>
-      </div>
-      <div class="nav-item" onclick="go('screen-cpd')">
-        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#aaa" stroke-width="1.4"/><polyline points="7,11 10,14 15,8" stroke="#aaa" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span>CPD</span>
-      </div>
-      <div class="nav-item" onclick="go('screen-card')">
-        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="2" stroke="#aaa" stroke-width="1.4"/><rect x="5" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="5" y="12" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="12" width="5" height="5" rx="0.5" fill="#aaa"/></svg>
-        <span>会員証</span>
-      </div>
-      <div class="nav-item" onclick="go('screen-mypage')">
-        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="#aaa" stroke-width="1.4"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#aaa" stroke-width="1.4" stroke-linecap="round"/></svg>
-        <span>マイページ</span>
-      </div>
-    </div>
-  </div>
+    </div></div>
 
   <!-- ===== SCREEN: APPLY (建築基準法) ===== -->
   <div class="screen" id="screen-apply">
@@ -777,30 +733,7 @@
         <div class="cpd-bar-wrap"><div class="cpd-bar-fill"></div></div>
         <div class="cpd-nums"><span>取得 <b>31.5</b> 単位</span><span>目標 50単位</span></div>
       </div>
-    </div>
-    <div class="bottom-nav">
-      <div class="nav-item" onclick="go('screen-home')">
-        <svg viewBox="0 0 22 22" fill="none"><path d="M3 10.5L11 3L19 10.5V19H14V14H8V19H3V10.5Z" stroke="#aaa" stroke-width="1.4" stroke-linejoin="round"/></svg>
-        <span>ホーム</span>
-      </div>
-      <div class="nav-item" onclick="go('screen-workshops')">
-        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="14" rx="2" stroke="#aaa" stroke-width="1.4"/><line x1="3" y1="9" x2="19" y2="9" stroke="#aaa" stroke-width="1.4"/><rect x="6" y="13" width="4" height="3" rx="0.5" fill="#aaa"/></svg>
-        <span>講習会</span>
-      </div>
-      <div class="nav-item" onclick="go('screen-cpd')">
-        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#aaa" stroke-width="1.4"/><polyline points="7,11 10,14 15,8" stroke="#aaa" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span>CPD</span>
-      </div>
-      <div class="nav-item active" onclick="go('screen-card')">
-        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="2" stroke="#1B4F8A" stroke-width="1.4"/><rect x="5" y="5" width="5" height="5" rx="0.5" fill="#1B4F8A"/><rect x="12" y="5" width="5" height="5" rx="0.5" fill="#1B4F8A"/><rect x="5" y="12" width="5" height="5" rx="0.5" fill="#1B4F8A"/><rect x="12" y="12" width="5" height="5" rx="0.5" fill="#1B4F8A"/></svg>
-        <span style="color:#1B4F8A;">会員証</span>
-      </div>
-      <div class="nav-item" onclick="go('screen-mypage')">
-        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="#aaa" stroke-width="1.4"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#aaa" stroke-width="1.4" stroke-linecap="round"/></svg>
-        <span>マイページ</span>
-      </div>
-    </div>
-  </div>
+    </div></div>
 
   <!-- ===== SCREEN: CPD ===== -->
   <div class="screen" id="screen-cpd">
@@ -860,30 +793,7 @@
         </div>
         <div class="cpd-rec-date">2025年4月19日</div>
       </div>
-    </div>
-    <div class="bottom-nav">
-      <div class="nav-item" onclick="go('screen-home')">
-        <svg viewBox="0 0 22 22" fill="none"><path d="M3 10.5L11 3L19 10.5V19H14V14H8V19H3V10.5Z" stroke="#aaa" stroke-width="1.4" stroke-linejoin="round"/></svg>
-        <span>ホーム</span>
-      </div>
-      <div class="nav-item" onclick="go('screen-workshops')">
-        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="14" rx="2" stroke="#aaa" stroke-width="1.4"/><line x1="3" y1="9" x2="19" y2="9" stroke="#aaa" stroke-width="1.4"/><rect x="6" y="13" width="4" height="3" rx="0.5" fill="#aaa"/></svg>
-        <span>講習会</span>
-      </div>
-      <div class="nav-item active" onclick="go('screen-cpd')">
-        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#1B4F8A" stroke-width="1.4"/><polyline points="7,11 10,14 15,8" stroke="#1B4F8A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span style="color:#1B4F8A;">CPD</span>
-      </div>
-      <div class="nav-item" onclick="go('screen-card')">
-        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="2" stroke="#aaa" stroke-width="1.4"/><rect x="5" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="5" y="12" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="12" width="5" height="5" rx="0.5" fill="#aaa"/></svg>
-        <span>会員証</span>
-      </div>
-      <div class="nav-item" onclick="go('screen-mypage')">
-        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="#aaa" stroke-width="1.4"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#aaa" stroke-width="1.4" stroke-linecap="round"/></svg>
-        <span>マイページ</span>
-      </div>
-    </div>
-  </div>
+    </div></div>
 
   <!-- ===== SCREEN: NEWS ===== -->
   <div class="screen" id="screen-news">
@@ -946,30 +856,7 @@
           <button class="apply-btn" style="font-size:11px;">PDFを開く</button>
         </div>
       </div>
-    </div>
-    <div class="bottom-nav">
-      <div class="nav-item" onclick="go('screen-home')">
-        <svg viewBox="0 0 22 22" fill="none"><path d="M3 10.5L11 3L19 10.5V19H14V14H8V19H3V10.5Z" stroke="#aaa" stroke-width="1.4" stroke-linejoin="round"/></svg>
-        <span>ホーム</span>
-      </div>
-      <div class="nav-item" onclick="go('screen-workshops')">
-        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="14" rx="2" stroke="#aaa" stroke-width="1.4"/><line x1="3" y1="9" x2="19" y2="9" stroke="#aaa" stroke-width="1.4"/><rect x="6" y="13" width="4" height="3" rx="0.5" fill="#aaa"/></svg>
-        <span>講習会</span>
-      </div>
-      <div class="nav-item" onclick="go('screen-cpd')">
-        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#aaa" stroke-width="1.4"/><polyline points="7,11 10,14 15,8" stroke="#aaa" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span>CPD</span>
-      </div>
-      <div class="nav-item" onclick="go('screen-card')">
-        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="2" stroke="#aaa" stroke-width="1.4"/><rect x="5" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="5" y="12" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="12" width="5" height="5" rx="0.5" fill="#aaa"/></svg>
-        <span>会員証</span>
-      </div>
-      <div class="nav-item" onclick="go('screen-mypage')">
-        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="#aaa" stroke-width="1.4"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#aaa" stroke-width="1.4" stroke-linecap="round"/></svg>
-        <span>マイページ</span>
-      </div>
-    </div>
-  </div>
+    </div></div>
 
   <!-- ===== SCREEN: MY PAGE ===== -->
   <div class="screen" id="screen-mypage">
@@ -1038,16 +925,88 @@
   </div>
 
 </div>
+  <!-- 共通ボトムナビ（.phone直下・常時固定） -->
+  <div class="bottom-nav" id="shared-bottom-nav">
+    <div class="nav-item" id="nav-home" onclick="go('screen-home')">
+      <svg viewBox="0 0 22 22" fill="none"><path d="M3 10.5L11 3L19 10.5V19H14V14H8V19H3V10.5Z" stroke="#aaa" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      <span>ホーム</span>
+    </div>
+    <div class="nav-item" id="nav-workshops" onclick="go('screen-workshops')">
+      <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="14" rx="2" stroke="#aaa" stroke-width="1.4"/><line x1="3" y1="9" x2="19" y2="9" stroke="#aaa" stroke-width="1.4"/><rect x="6" y="13" width="4" height="3" rx="0.5" fill="#aaa"/></svg>
+      <span>講習会</span>
+    </div>
+    <div class="nav-item" id="nav-cpd" onclick="go('screen-cpd')">
+      <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#aaa" stroke-width="1.4"/><polyline points="7,11 10,14 15,8" stroke="#aaa" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>CPD</span>
+    </div>
+    <div class="nav-item" id="nav-card" onclick="go('screen-card')">
+      <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="2" stroke="#aaa" stroke-width="1.4"/><rect x="5" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="5" y="12" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="12" width="5" height="5" rx="0.5" fill="#aaa"/></svg>
+      <span>会員証</span>
+    </div>
+    <div class="nav-item" id="nav-mypage" onclick="go('screen-mypage')">
+      <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="#aaa" stroke-width="1.4"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#aaa" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <span>マイページ</span>
+    </div>
+  </div>
+
+
 
 <script>
+  // ナビに対応するscreen IDのマップ
+  const NAV_MAP = {
+    'screen-home':      'nav-home',
+    'screen-workshops': 'nav-workshops',
+    'screen-apply':     null,
+    'screen-apply2':    null,
+    'screen-complete':  null,
+    'screen-complete2': null,
+    'screen-cpd':       'nav-cpd',
+    'screen-card':      'nav-card',
+    'screen-news':      null,
+    'screen-mypage':    'nav-mypage',
+  };
+
   function go(screenId) {
+    // 画面切り替え
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const target = document.getElementById(screenId);
     if (target) {
       target.classList.add('active');
-      target.querySelector('.body') && (target.querySelector('.body').scrollTop = 0);
+      const body = target.querySelector('.body');
+      if (body) body.scrollTop = 0;
+    }
+
+    // ナビのアクティブ状態を更新
+    const navId = NAV_MAP[screenId];
+    const sharedNav = document.getElementById('shared-bottom-nav');
+    if (sharedNav) {
+      // フォーム・完了画面ではナビを隠す
+      const hideNav = ['screen-apply','screen-apply2','screen-complete','screen-complete2'];
+      sharedNav.style.display = hideNav.includes(screenId) ? 'none' : 'flex';
+
+      // アクティブ色をリセット
+      sharedNav.querySelectorAll('.nav-item').forEach(item => {
+        item.querySelector('svg').querySelectorAll('[stroke]').forEach(el => {
+          if (el.getAttribute('stroke') === '#1B4F8A') el.setAttribute('stroke','#aaa');
+        });
+        item.querySelectorAll('[fill="#1B4F8A"]').forEach(el => el.setAttribute('fill','#aaa'));
+        const span = item.querySelector('span');
+        if (span) { span.style.color = ''; span.style.fontWeight = ''; }
+      });
+
+      // 対応するナビをアクティブに
+      if (navId) {
+        const activeNav = document.getElementById(navId);
+        if (activeNav) {
+          activeNav.querySelectorAll('[stroke="#aaa"]').forEach(el => el.setAttribute('stroke','#1B4F8A'));
+          activeNav.querySelectorAll('[fill="#aaa"]').forEach(el => el.setAttribute('fill','#1B4F8A'));
+          const span = activeNav.querySelector('span');
+          if (span) { span.style.color = '#1B4F8A'; span.style.fontWeight = '600'; }
+        }
+      }
     }
   }
+
   function toggleRadio(el) {
     el.closest('.radio-group').querySelectorAll('.radio-item').forEach(r => {
       r.classList.remove('selected');
@@ -1058,6 +1017,9 @@
     el.querySelector('.rdot').style.borderColor = '#1B4F8A';
     el.querySelector('.rdot').style.background = '#1B4F8A';
   }
+
+  // 初期状態：ホームをアクティブに
+  go('screen-home');
 </script>
 </body>
 </html>
