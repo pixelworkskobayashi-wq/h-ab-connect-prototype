@@ -24,7 +24,7 @@ jobs:
       - name: 依存パッケージをインストール
         run: npm ci
 
-      - name: Playwright ブラウザをインストール
+      - name: Playwright ブラウザをインストール（Chromiumのみ）
         run: npx playwright install --with-deps chromium
 
       - name: テスト実行（モバイル）
