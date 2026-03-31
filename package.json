@@ -1,0 +1,27 @@
+{
+  "name": "h-ab-connect",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:mobile": "playwright test --project=mobile-chrome",
+    "test:desktop": "playwright test --project=desktop-chrome",
+    "serve": "serve . -p 8080 -s"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pixelworkskobayashi-wq/h-ab-connect-prototype.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pixelworkskobayashi-wq/h-ab-connect-prototype/issues"
+  },
+  "homepage": "https://github.com/pixelworkskobayashi-wq/h-ab-connect-prototype#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "serve": "^14.2.6"
+  }
+}
