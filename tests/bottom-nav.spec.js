@@ -1,16 +1,21 @@
 const { test, expect } = require('@playwright/test');
 
-// 共通ナビが画面下端に固定されているか検証
+// 共通ナビが .phone コンテナの下端に固定されているか検証
 async function assertNavFixed(page) {
-  const vh = page.viewportSize().height;
   const nav = page.locator('#shared-bottom-nav');
   await expect(nav).toBeVisible();
-  const box = await nav.boundingBox();
+
+  const navBox = await nav.boundingBox();
+  const phoneBox = await page.locator('.phone').boundingBox();
+
+  // ナビの下端が .phone の下端と一致しているか（±5px許容）
+  const diff = Math.abs((navBox.y + navBox.height) - (phoneBox.y + phoneBox.height));
   expect(
-    box.y + box.height,
-    `ナビ下端=${Math.round(box.y + box.height)}px / viewport=${vh}px`
-  ).toBeCloseTo(vh, -1);
-  expect(box.height).toBeGreaterThanOrEqual(44);
+    diff,
+    `ナビ下端=${Math.round(navBox.y + navBox.height)}px / phone下端=${Math.round(phoneBox.y + phoneBox.height)}px / 差=${Math.round(diff)}px`
+  ).toBeLessThanOrEqual(5);
+
+  expect(navBox.height).toBeGreaterThanOrEqual(44);
 }
 
 // スクロール操作 + ナビ位置検証
