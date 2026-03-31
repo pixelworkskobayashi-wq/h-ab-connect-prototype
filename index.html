@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>h-ab Connect</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background: #E8EFF8;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px 0;
+  }
+  .phone {
+    width: 375px;
+    min-height: 812px;
+    background: #F4F7FB;
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    position: relative;
+  }
+  @media (max-width: 420px) {
+    body { padding: 0; background: #F4F7FB; }
+    .phone { width: 100vw; min-height: 100vh; border-radius: 0; box-shadow: none; }
+  }
+
+  /* SCREENS */
+  .screen { display: none; flex-direction: column; min-height: 812px; }
+  .screen.active { display: flex; }
+
+  /* STATUS BAR */
+  .status-bar {
+    background: #1B4F8A;
+    padding: 12px 20px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .status-bar span { font-size: 12px; color: #fff; font-weight: 600; }
+
+  /* APP HEADER */
+  .app-header {
+    background: #1B4F8A;
+    padding: 8px 20px 16px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .header-top { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .back-btn {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; opacity: 0.85;
+  }
+  .header-title { font-size: 18px; font-weight: 600; }
+  .header-sub { font-size: 12px; opacity: 0.75; margin-top: 2px; }
+  .header-badges { display: flex; gap: 8px; margin-top: 10px; }
+  .hbadge {
+    background: rgba(255,255,255,0.15);
+    border-radius: 20px; padding: 4px 12px;
+    font-size: 11px; color: #fff;
+  }
+  .hbadge b { font-weight: 600; }
+
+  /* BODY */
+  .body { flex: 1; overflow-y: auto; padding: 16px; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    background: #fff;
+    border-top: 0.5px solid #D6E4F4;
+    display: flex;
+    padding: 8px 0 12px;
+    flex-shrink: 0;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; gap: 3px; cursor: pointer;
+  }
+  .nav-item svg { width: 22px; height: 22px; }
+  .nav-item span { font-size: 10px; color: #999; }
+  .nav-item.active span { color: #1B4F8A; font-weight: 600; }
+
+  /* SECTION TITLE */
+  .sec-title {
+    font-size: 12px; font-weight: 600; color: #1B4F8A;
+    margin-bottom: 10px; letter-spacing: 0.04em;
+  }
+
+  /* QUICK GRID */
+  .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+  .quick-card {
+    background: #fff; border-radius: 12px;
+    border: 0.5px solid #D6E4F4; padding: 14px 12px;
+    cursor: pointer; transition: transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .quick-card:active { transform: scale(0.96); }
+  .qicon {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 8px;
+  }
+  .qlabel { font-size: 12px; font-weight: 600; color: #1a1a1a; line-height: 1.3; }
+  .qsub { font-size: 10px; color: #888; margin-top: 3px; }
+
+  /* NOTIF */
+  .notif-item {
+    background: #fff; border-radius: 10px;
+    border: 0.5px solid #D6E4F4; padding: 11px 14px;
+    margin-bottom: 8px; display: flex; gap: 10px; align-items: flex-start;
+  }
+  .ndot { width: 7px; height: 7px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+  .ntitle { font-size: 12px; font-weight: 500; color: #1a1a1a; line-height: 1.4; }
+  .nsub { font-size: 10px; color: #888; margin-top: 2px; }
+
+  /* WORKSHOP LIST */
+  .ws-card {
+    background: #fff; border-radius: 12px;
+    border: 0.5px solid #D6E4F4; padding: 14px;
+    margin-bottom: 10px; cursor: pointer; transition: transform 0.1s;
+  }
+  .ws-card:active { transform: scale(0.98); }
+  .ws-card.disabled { opacity: 0.6; cursor: default; }
+  .ws-head { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .type-badge {
+    font-size: 10px; font-weight: 600; padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .cpd-badge {
+    font-size: 10px; color: #1D9E75; background: #E1F5EE;
+    padding: 3px 10px; border-radius: 20px; font-weight: 500;
+  }
+  .ws-title { font-size: 13px; font-weight: 600; color: #1a1a1a; line-height: 1.4; margin-bottom: 8px; }
+  .ws-meta { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+  .ws-meta-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #666; }
+  .ws-foot { display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid #EEF2F8; padding-top: 10px; }
+  .seats-wrap { display: flex; flex-direction: column; gap: 4px; }
+  .sbar-wrap { width: 90px; background: #EEF4FB; border-radius: 3px; height: 5px; }
+  .sbar-fill { height: 100%; border-radius: 3px; }
+  .stext { font-size: 10px; color: #888; }
+  .apply-btn {
+    font-size: 11px; font-weight: 600; padding: 7px 16px;
+    border-radius: 20px; border: none; cursor: pointer;
+    color: #fff; background: #1B4F8A; transition: opacity 0.15s;
+  }
+  .apply-btn:active { opacity: 0.8; }
+  .apply-btn.full { background: #ccc; color: #888; cursor: default; }
+
+  /* MEMBER CARD */
+  .member-card {
+    background: linear-gradient(135deg, #1B4F8A 0%, #2C6DB5 100%);
+    border-radius: 16px; padding: 20px; margin-bottom: 14px; position: relative; overflow: hidden;
+  }
+  .card-wm {
+    position: absolute; right: -10px; top: -10px;
+    width: 90px; height: 90px; border-radius: 50%;
+    border: 14px solid rgba(255,255,255,0.06);
+  }
+  .card-org { font-size: 10px; color: rgba(255,255,255,0.7); margin-bottom: 10px; letter-spacing: 0.04em; }
+  .card-name { font-size: 20px; font-weight: 600; color: #fff; }
+  .card-name-en { font-size: 11px; color: rgba(255,255,255,0.65); margin-top: 2px; }
+  .card-div { height: 0.5px; background: rgba(255,255,255,0.25); margin: 14px 0; }
+  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cil { font-size: 9px; color: rgba(255,255,255,0.6); margin-bottom: 3px; }
+  .civ { font-size: 11px; color: #fff; font-weight: 600; }
+  .card-bot { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 14px; }
+  .card-id-label { font-size: 9px; color: rgba(255,255,255,0.6); }
+  .card-id-num { font-size: 13px; color: #fff; font-weight: 600; margin-top: 2px; }
+  .valid-badge {
+    background: rgba(255,255,255,0.15); border: 0.5px solid rgba(255,255,255,0.3);
+    border-radius: 20px; padding: 4px 12px; font-size: 10px; color: #fff;
+  }
+  .status-strip {
+    background: #E8F2E8; border-radius: 10px; border: 0.5px solid #B8D9B8;
+    padding: 9px 14px; display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  }
+  .sdot { width: 8px; height: 8px; border-radius: 50%; background: #3B6D11; flex-shrink: 0; }
+  .stext2 { font-size: 11px; color: #3B6D11; font-weight: 500; }
+  .qr-section {
+    background: #fff; border-radius: 12px; border: 0.5px solid #D6E4F4;
+    padding: 16px; display: flex; flex-direction: column; align-items: center; margin-bottom: 12px;
+  }
+  .qr-title { font-size: 11px; font-weight: 600; color: #1B4F8A; margin-bottom: 12px; }
+  .qr-note { font-size: 10px; color: #888; margin-top: 10px; text-align: center; line-height: 1.6; }
+  .cpd-mini {
+    background: #fff; border-radius: 12px; border: 0.5px solid #D6E4F4; padding: 12px 14px;
+  }
+  .cpd-mini-label { font-size: 11px; color: #888; margin-bottom: 8px; }
+  .cpd-bar-wrap { background: #EEF4FB; border-radius: 4px; height: 7px; overflow: hidden; }
+  .cpd-bar-fill { background: #1B4F8A; height: 100%; border-radius: 4px; width: 63%; }
+  .cpd-nums { display: flex; justify-content: space-between; margin-top: 5px; }
+  .cpd-nums span { font-size: 11px; color: #888; }
+  .cpd-nums b { color: #1B4F8A; font-weight: 600; }
+
+  /* CPD SCREEN */
+  .cpd-summary {
+    background: #1B4F8A; border-radius: 14px; padding: 18px; margin-bottom: 14px; color: #fff;
+  }
+  .cpd-big { font-size: 40px; font-weight: 700; line-height: 1; }
+  .cpd-unit { font-size: 14px; opacity: 0.8; margin-left: 4px; }
+  .cpd-goal { font-size: 11px; opacity: 0.7; margin-top: 6px; }
+  .cpd-pbar-wrap { background: rgba(255,255,255,0.2); border-radius: 4px; height: 8px; margin-top: 10px; }
+  .cpd-pbar-fill { background: #fff; height: 100%; border-radius: 4px; width: 63%; }
+  .cpd-record {
+    background: #fff; border-radius: 12px; border: 0.5px solid #D6E4F4;
+    padding: 13px 14px; margin-bottom: 8px;
+  }
+  .cpd-rec-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+  .cpd-rec-title { font-size: 12px; font-weight: 600; color: #1a1a1a; line-height: 1.4; flex: 1; padding-right: 8px; }
+  .cpd-pts { font-size: 14px; font-weight: 700; color: #1B4F8A; white-space: nowrap; }
+  .cpd-pts span { font-size: 10px; font-weight: 400; }
+  .cpd-rec-date { font-size: 10px; color: #888; }
+
+  /* APPLICATION FORM */
+  .detail-hero {
+    background: #fff; padding: 16px; border-bottom: 0.5px solid #D6E4F4;
+  }
+  .type-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .detail-title { font-size: 14px; font-weight: 600; color: #1a1a1a; line-height: 1.45; margin-bottom: 12px; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .dmi { background: #F4F7FB; border-radius: 8px; padding: 9px 11px; }
+  .dml { font-size: 10px; color: #888; margin-bottom: 3px; }
+  .dmv { font-size: 12px; font-weight: 600; color: #1a1a1a; }
+  .dmv.blue { color: #1B4F8A; }
+  .form-section { background: #fff; padding: 16px; border-top: 0.5px solid #D6E4F4; margin-top: 8px; }
+  .form-group { margin-bottom: 13px; }
+  .form-label { font-size: 11px; color: #888; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+  .req { font-size: 9px; color: #E24B4A; background: #FCEBEB; padding: 2px 6px; border-radius: 3px; }
+  .form-value {
+    font-size: 12px; color: #1a1a1a; background: #F4F7FB;
+    border-radius: 8px; border: 0.5px solid #D6E4F4;
+    padding: 10px 12px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .auto-tag { font-size: 10px; color: #1D9E75; background: #E1F5EE; padding: 2px 8px; border-radius: 10px; }
+  .radio-group { display: flex; gap: 10px; }
+  .radio-item {
+    flex: 1; display: flex; align-items: center; gap: 7px;
+    background: #fff; border: 0.5px solid #D6E4F4; border-radius: 8px;
+    padding: 10px 12px; font-size: 12px; color: #333; cursor: pointer;
+  }
+  .radio-item.selected { border-color: #1B4F8A; background: #EEF4FB; color: #1B4F8A; }
+  .rdot { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #ccc; flex-shrink: 0; }
+  .radio-item.selected .rdot { border-color: #1B4F8A; background: #1B4F8A; }
+  .fselect {
+    width: 100%; font-size: 12px; color: #1a1a1a;
+    background: #fff; border-radius: 8px; border: 0.5px solid #D6E4F4;
+    padding: 10px 12px; appearance: none;
+  }
+  .submit-area { background: #fff; padding: 16px; border-top: 0.5px solid #D6E4F4; }
+  .confirm-check { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 12px; font-size: 11px; color: #555; line-height: 1.6; }
+  .chkbox {
+    width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid #1B4F8A;
+    background: #1B4F8A; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+  }
+  .submit-btn {
+    width: 100%; background: #1B4F8A; color: #fff; border: none;
+    border-radius: 10px; padding: 14px; font-size: 15px; font-weight: 600; cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .submit-btn:active { opacity: 0.85; }
+  .submit-note { font-size: 10px; color: #888; text-align: center; margin-top: 8px; line-height: 1.6; }
+
+  /* COMPLETE SCREEN */
+  .complete-body {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 32px 24px; background: #F4F7FB;
+  }
+  .complete-icon {
+    width: 72px; height: 72px; border-radius: 50%; background: #E8F2E8;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+  }
+  .complete-title { font-size: 20px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; text-align: center; }
+  .complete-sub { font-size: 13px; color: #666; text-align: center; line-height: 1.7; margin-bottom: 28px; }
+  .complete-card {
+    background: #fff; border-radius: 12px; border: 0.5px solid #D6E4F4;
+    padding: 16px; width: 100%; margin-bottom: 20px;
+  }
+  .cc-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 0.5px solid #EEF2F8; }
+  .cc-row:last-child { border-bottom: none; }
+  .cc-label { font-size: 11px; color: #888; }
+  .cc-value { font-size: 12px; font-weight: 600; color: #1a1a1a; }
+  .home-btn {
+    width: 100%; background: #1B4F8A; color: #fff; border: none;
+    border-radius: 10px; padding: 14px; font-size: 15px; font-weight: 600; cursor: pointer;
+  }
+
+  /* FILTER TABS */
+  .filter-tabs { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; }
+  .ftab {
+    flex-shrink: 0; padding: 5px 14px; border-radius: 20px;
+    font-size: 11px; font-weight: 500; border: 0.5px solid #D6E4F4;
+    background: #fff; color: #555; cursor: pointer;
+  }
+  .ftab.active { background: #1B4F8A; border-color: #1B4F8A; color: #fff; }
+
+  /* SEATS DETAIL */
+  .seats-section { background: #fff; padding: 14px 16px; border-top: 0.5px solid #D6E4F4; margin-top: 8px; }
+  .sds-bar { background: #EEF4FB; border-radius: 4px; height: 8px; overflow: hidden; margin-bottom: 6px; }
+  .sds-fill { background: #1B4F8A; height: 100%; border-radius: 4px; width: 76%; }
+  .sds-nums { display: flex; justify-content: space-between; font-size: 11px; color: #888; }
+  .sds-nums b { color: #1B4F8A; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- ===== SCREEN: HOME ===== -->
+  <div class="screen active" id="screen-home">
+    <div class="status-bar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="app-header">
+      <div class="header-title">h-ab Connect</div>
+      <div class="header-sub">おはようございます、山田さん</div>
+      <div class="header-badges">
+        <div class="hbadge">CPD <b>31.5</b> 単位</div>
+        <div class="hbadge">会員証 <b>有効</b></div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="sec-title">クイックアクセス</div>
+      <div class="quick-grid">
+        <div class="quick-card" onclick="go('screen-workshops')">
+          <div class="qicon" style="background:#EEF4FB;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="12" rx="2" stroke="#1B4F8A" stroke-width="1.3"/><line x1="1" y1="6" x2="15" y2="6" stroke="#1B4F8A" stroke-width="1.3"/><rect x="4" y="9" width="3" height="3" rx="0.5" fill="#1B4F8A"/><rect x="9" y="9" width="3" height="3" rx="0.5" fill="#1B4F8A"/></svg>
+          </div>
+          <div class="qlabel">講習会申込</div>
+          <div class="qsub">3件 募集中</div>
+        </div>
+        <div class="quick-card" onclick="go('screen-cpd')">
+          <div class="qicon" style="background:#E1F5EE;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#1D9E75" stroke-width="1.3"/><polyline points="5,8 7.5,10.5 11,6" stroke="#1D9E75" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="qlabel">CPD記録</div>
+          <div class="qsub">今年度 31.5単位</div>
+        </div>
+        <div class="quick-card" onclick="go('screen-news')">
+          <div class="qicon" style="background:#FBF5EE;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="1.5" width="12" height="13" rx="2" stroke="#BA7517" stroke-width="1.3"/><line x1="5" y1="6" x2="11" y2="6" stroke="#BA7517" stroke-width="1.1"/><line x1="5" y1="9" x2="11" y2="9" stroke="#BA7517" stroke-width="1.1"/><line x1="5" y1="12" x2="8.5" y2="12" stroke="#BA7517" stroke-width="1.1"/></svg>
+          </div>
+          <div class="qlabel">会誌・ニュース</div>
+          <div class="qsub">未読 2件</div>
+        </div>
+        <div class="quick-card" onclick="go('screen-card')">
+          <div class="qicon" style="background:#EEF4FB;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#1B4F8A" stroke-width="1.3"/><rect x="4" y="4" width="3" height="3" rx="0.5" fill="#1B4F8A"/><rect x="9" y="4" width="3" height="3" rx="0.5" fill="#1B4F8A"/><rect x="4" y="9" width="3" height="3" rx="0.5" fill="#1B4F8A"/><rect x="9" y="9" width="3" height="3" rx="0.5" fill="#1B4F8A"/></svg>
+          </div>
+          <div class="qlabel">デジタル会員証</div>
+          <div class="qsub">QR表示</div>
+        </div>
+      </div>
+
+      <div class="sec-title">お知らせ</div>
+      <div class="notif-item" onclick="go('screen-workshops')" style="cursor:pointer;">
+        <div class="ndot" style="background:#1B4F8A;"></div>
+        <div>
+          <div class="ntitle">建築基準法講習会（6月）申込開始</div>
+          <div class="nsub">2026年4月1日 · 定員まで残り24名</div>
+        </div>
+      </div>
+      <div class="notif-item">
+        <div class="ndot" style="background:#BA7517;"></div>
+        <div>
+          <div class="ntitle">会誌「建築士」5月号 配信</div>
+          <div class="nsub">2026年3月31日</div>
+        </div>
+      </div>
+      <div class="notif-item" onclick="go('screen-cpd')" style="cursor:pointer;">
+        <div class="ndot" style="background:#3B6D11;"></div>
+        <div>
+          <div class="ntitle">CPD証明書のダウンロード受付中</div>
+          <div class="nsub">2026年3月28日</div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item active" onclick="go('screen-home')">
+        <svg viewBox="0 0 22 22" fill="none"><path d="M3 10.5L11 3L19 10.5V19H14V14H8V19H3V10.5Z" stroke="#1B4F8A" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        <span>ホーム</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-workshops')">
+        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="14" rx="2" stroke="#aaa" stroke-width="1.4"/><line x1="3" y1="9" x2="19" y2="9" stroke="#aaa" stroke-width="1.4"/><rect x="6" y="13" width="4" height="3" rx="0.5" fill="#aaa"/></svg>
+        <span>講習会</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-cpd')">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#aaa" stroke-width="1.4"/><polyline points="7,11 10,14 15,8" stroke="#aaa" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>CPD</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-card')">
+        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="2" stroke="#aaa" stroke-width="1.4"/><rect x="5" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="5" y="12" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="12" width="5" height="5" rx="0.5" fill="#aaa"/></svg>
+        <span>会員証</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-mypage')">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="#aaa" stroke-width="1.4"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#aaa" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span>マイページ</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: WORKSHOPS ===== -->
+  <div class="screen" id="screen-workshops">
+    <div class="status-bar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="app-header">
+      <div class="header-top">
+        <div class="back-btn" onclick="go('screen-home')">
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><polyline points="8,1 2,8 8,15" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div class="header-title">講習会・イベント</div>
+          <div class="header-sub">2026年度 開催予定</div>
+        </div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="filter-tabs">
+        <div class="ftab active">すべて</div>
+        <div class="ftab">申込受付中</div>
+        <div class="ftab">CPD対象</div>
+        <div class="ftab">無料</div>
+      </div>
+
+      <div class="ws-card" onclick="go('screen-apply')">
+        <div class="ws-head">
+          <span class="type-badge" style="background:#EEF4FB;color:#1B4F8A;">建築基準法</span>
+          <span class="cpd-badge">CPD 6.0単位</span>
+        </div>
+        <div class="ws-title">建築基準法に基づく定期講習会（2026年6月）</div>
+        <div class="ws-meta">
+          <div class="ws-meta-row">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="9" rx="1.2" stroke="#888" stroke-width="1"/><line x1="1" y1="5" x2="11" y2="5" stroke="#888" stroke-width="1"/></svg>
+            2026年6月14日（日）9:00〜17:00
+          </div>
+          <div class="ws-meta-row">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1C4.3 1 3 2.4 3 4c0 3 3 7 3 7s3-4 3-7c0-1.6-1.3-3-3-3z" stroke="#888" stroke-width="1"/><circle cx="6" cy="4" r="1.2" fill="#888"/></svg>
+            札幌コンベンションセンター
+          </div>
+          <div class="ws-meta-row">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1.5" width="10" height="9" rx="1.2" stroke="#888" stroke-width="1"/><line x1="3.5" y1="5" x2="8.5" y2="5" stroke="#888" stroke-width="1"/><line x1="3.5" y1="7.5" x2="6.5" y2="7.5" stroke="#888" stroke-width="1"/></svg>
+            受講料 7,700円（税込）
+          </div>
+        </div>
+        <div class="ws-foot">
+          <div class="seats-wrap">
+            <div class="sbar-wrap"><div class="sbar-fill" style="width:76%;background:#1B4F8A;"></div></div>
+            <div class="stext">残り 24名 / 定員100名</div>
+          </div>
+          <button class="apply-btn" onclick="event.stopPropagation();go('screen-apply')">申し込む</button>
+        </div>
+      </div>
+
+      <div class="ws-card" onclick="go('screen-apply2')">
+        <div class="ws-head">
+          <span class="type-badge" style="background:#E1F5EE;color:#0F6E56;">監理技術者</span>
+          <span class="cpd-badge">CPD 7.0単位</span>
+        </div>
+        <div class="ws-title">監理技術者講習（2026年7月）</div>
+        <div class="ws-meta">
+          <div class="ws-meta-row">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="9" rx="1.2" stroke="#888" stroke-width="1"/><line x1="1" y1="5" x2="11" y2="5" stroke="#888" stroke-width="1"/></svg>
+            2026年7月5日（日）9:30〜17:30
+          </div>
+          <div class="ws-meta-row">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1C4.3 1 3 2.4 3 4c0 3 3 7 3 7s3-4 3-7c0-1.6-1.3-3-3-3z" stroke="#888" stroke-width="1"/><circle cx="6" cy="4" r="1.2" fill="#888"/></svg>
+            北海道建設会館
+          </div>
+          <div class="ws-meta-row">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1.5" width="10" height="9" rx="1.2" stroke="#888" stroke-width="1"/><line x1="3.5" y1="5" x2="8.5" y2="5" stroke="#888" stroke-width="1"/><line x1="3.5" y1="7.5" x2="6.5" y2="7.5" stroke="#888" stroke-width="1"/></svg>
+            受講料 11,000円（税込）
+          </div>
+        </div>
+        <div class="ws-foot">
+          <div class="seats-wrap">
+            <div class="sbar-wrap"><div class="sbar-fill" style="width:40%;background:#1B4F8A;"></div></div>
+            <div class="stext">残り 48名 / 定員80名</div>
+          </div>
+          <button class="apply-btn" onclick="event.stopPropagation();go('screen-apply2')">申し込む</button>
+        </div>
+      </div>
+
+      <div class="ws-card disabled">
+        <div class="ws-head">
+          <span class="type-badge" style="background:#F1EFE8;color:#5F5E5A;">まちづくり</span>
+          <span class="cpd-badge" style="color:#888;background:#F1EFE8;">CPD 2.0単位</span>
+        </div>
+        <div class="ws-title">まちづくりワークショップ「札幌の再開発を考える」</div>
+        <div class="ws-meta">
+          <div class="ws-meta-row">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="9" rx="1.2" stroke="#888" stroke-width="1"/><line x1="1" y1="5" x2="11" y2="5" stroke="#888" stroke-width="1"/></svg>
+            2026年5月17日（土）13:00〜17:00
+          </div>
+          <div class="ws-meta-row">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1C4.3 1 3 2.4 3 4c0 3 3 7 3 7s3-4 3-7c0-1.6-1.3-3-3-3z" stroke="#888" stroke-width="1"/><circle cx="6" cy="4" r="1.2" fill="#888"/></svg>
+            札幌市中央区民センター
+          </div>
+        </div>
+        <div class="ws-foot">
+          <div class="seats-wrap">
+            <div class="sbar-wrap"><div class="sbar-fill" style="width:100%;background:#ccc;"></div></div>
+            <div class="stext" style="color:#E24B4A;">定員締切</div>
+          </div>
+          <button class="apply-btn full">締切</button>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="go('screen-home')">
+        <svg viewBox="0 0 22 22" fill="none"><path d="M3 10.5L11 3L19 10.5V19H14V14H8V19H3V10.5Z" stroke="#aaa" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        <span>ホーム</span>
+      </div>
+      <div class="nav-item active" onclick="go('screen-workshops')">
+        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="14" rx="2" stroke="#1B4F8A" stroke-width="1.4"/><line x1="3" y1="9" x2="19" y2="9" stroke="#1B4F8A" stroke-width="1.4"/><rect x="6" y="13" width="4" height="3" rx="0.5" fill="#1B4F8A"/></svg>
+        <span style="color:#1B4F8A;">講習会</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-cpd')">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#aaa" stroke-width="1.4"/><polyline points="7,11 10,14 15,8" stroke="#aaa" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>CPD</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-card')">
+        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="2" stroke="#aaa" stroke-width="1.4"/><rect x="5" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="5" y="12" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="12" width="5" height="5" rx="0.5" fill="#aaa"/></svg>
+        <span>会員証</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-mypage')">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="#aaa" stroke-width="1.4"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#aaa" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span>マイページ</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: APPLY (建築基準法) ===== -->
+  <div class="screen" id="screen-apply">
+    <div class="status-bar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="app-header">
+      <div class="header-top">
+        <div class="back-btn" onclick="go('screen-workshops')">
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><polyline points="8,1 2,8 8,15" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div class="header-title">申込フォーム</div>
+          <div class="header-sub">建築基準法 定期講習会（6月）</div>
+        </div>
+      </div>
+    </div>
+    <div class="body" style="padding:0;">
+      <div class="detail-hero">
+        <div class="type-row">
+          <span class="type-badge" style="background:#EEF4FB;color:#1B4F8A;font-size:10px;">建築基準法</span>
+          <span class="cpd-badge">CPD 6.0単位</span>
+        </div>
+        <div class="detail-title">建築基準法に基づく定期講習会（2026年6月）</div>
+        <div class="detail-grid">
+          <div class="dmi"><div class="dml">開催日</div><div class="dmv">6月14日（日）</div></div>
+          <div class="dmi"><div class="dml">時間</div><div class="dmv">9:00〜17:00</div></div>
+          <div class="dmi"><div class="dml">受講料</div><div class="dmv blue">7,700円</div></div>
+          <div class="dmi"><div class="dml">会場</div><div class="dmv" style="font-size:11px;">札幌コンベンション</div></div>
+        </div>
+      </div>
+      <div class="seats-section">
+        <div class="sec-title" style="margin-bottom:8px;">残席状況</div>
+        <div class="sds-bar"><div class="sds-fill"></div></div>
+        <div class="sds-nums">申込済 <b>76名</b> &nbsp;|&nbsp; 残り <b>24名</b> / 定員100名</div>
+      </div>
+      <div class="form-section">
+        <div class="sec-title" style="margin-bottom:12px;">申込情報の確認</div>
+        <div class="form-group">
+          <div class="form-label">氏名 <span class="req">必須</span></div>
+          <div class="form-value">山田 太郎 <span class="auto-tag">自動入力</span></div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">会員番号 <span class="req">必須</span></div>
+          <div class="form-value">H-00042567 <span class="auto-tag">自動入力</span></div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">資格区分 <span class="req">必須</span></div>
+          <div class="form-value">一級建築士 <span class="auto-tag">自動入力</span></div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">受講区分 <span class="req">必須</span></div>
+          <div class="radio-group">
+            <div class="radio-item selected"><div class="rdot"></div>初受講</div>
+            <div class="radio-item" onclick="toggleRadio(this)"><div class="rdot" style="border-color:#ccc;background:transparent;"></div>再受講</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">支払方法 <span class="req">必須</span></div>
+          <select class="fselect"><option>クレジットカード</option><option>銀行振込</option></select>
+        </div>
+      </div>
+      <div class="submit-area">
+        <div class="confirm-check">
+          <div class="chkbox"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,7 9,1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          受講規約・個人情報の取扱いに同意します
+        </div>
+        <button class="submit-btn" onclick="go('screen-complete')">申込を確定する</button>
+        <div class="submit-note">確定後、登録メールアドレスに<br>受付完了メールが送信されます</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: APPLY2 (監理技術者) ===== -->
+  <div class="screen" id="screen-apply2">
+    <div class="status-bar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="app-header">
+      <div class="header-top">
+        <div class="back-btn" onclick="go('screen-workshops')">
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><polyline points="8,1 2,8 8,15" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div class="header-title">申込フォーム</div>
+          <div class="header-sub">監理技術者講習（7月）</div>
+        </div>
+      </div>
+    </div>
+    <div class="body" style="padding:0;">
+      <div class="detail-hero">
+        <div class="type-row">
+          <span class="type-badge" style="background:#E1F5EE;color:#0F6E56;font-size:10px;">監理技術者</span>
+          <span class="cpd-badge">CPD 7.0単位</span>
+        </div>
+        <div class="detail-title">監理技術者講習（2026年7月）</div>
+        <div class="detail-grid">
+          <div class="dmi"><div class="dml">開催日</div><div class="dmv">7月5日（日）</div></div>
+          <div class="dmi"><div class="dml">時間</div><div class="dmv">9:30〜17:30</div></div>
+          <div class="dmi"><div class="dml">受講料</div><div class="dmv blue">11,000円</div></div>
+          <div class="dmi"><div class="dml">会場</div><div class="dmv" style="font-size:11px;">北海道建設会館</div></div>
+        </div>
+      </div>
+      <div class="seats-section">
+        <div class="sec-title" style="margin-bottom:8px;">残席状況</div>
+        <div class="sds-bar"><div class="sds-fill" style="width:40%;"></div></div>
+        <div class="sds-nums">申込済 <b>32名</b> &nbsp;|&nbsp; 残り <b>48名</b> / 定員80名</div>
+      </div>
+      <div class="form-section">
+        <div class="sec-title" style="margin-bottom:12px;">申込情報の確認</div>
+        <div class="form-group">
+          <div class="form-label">氏名 <span class="req">必須</span></div>
+          <div class="form-value">山田 太郎 <span class="auto-tag">自動入力</span></div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">会員番号 <span class="req">必須</span></div>
+          <div class="form-value">H-00042567 <span class="auto-tag">自動入力</span></div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">資格区分 <span class="req">必須</span></div>
+          <div class="form-value">一級建築士 <span class="auto-tag">自動入力</span></div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">支払方法 <span class="req">必須</span></div>
+          <select class="fselect"><option>クレジットカード</option><option>銀行振込</option></select>
+        </div>
+      </div>
+      <div class="submit-area">
+        <div class="confirm-check">
+          <div class="chkbox"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,7 9,1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          受講規約・個人情報の取扱いに同意します
+        </div>
+        <button class="submit-btn" onclick="go('screen-complete2')">申込を確定する</button>
+        <div class="submit-note">確定後、登録メールアドレスに<br>受付完了メールが送信されます</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: COMPLETE ===== -->
+  <div class="screen" id="screen-complete">
+    <div class="status-bar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="app-header">
+      <div class="header-title">申込完了</div>
+    </div>
+    <div class="complete-body">
+      <div class="complete-icon">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="#3B6D11" stroke-width="1.5"/><polyline points="10,18 15.5,24 26,12" stroke="#3B6D11" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="complete-title">申込が完了しました</div>
+      <div class="complete-sub">受付完了メールを送信しました。<br>当日は会員証をご提示ください。</div>
+      <div class="complete-card">
+        <div class="cc-row"><span class="cc-label">講習会</span><span class="cc-value">建築基準法 定期講習会</span></div>
+        <div class="cc-row"><span class="cc-label">開催日</span><span class="cc-value">2026年6月14日（日）</span></div>
+        <div class="cc-row"><span class="cc-label">会場</span><span class="cc-value">札幌コンベンション</span></div>
+        <div class="cc-row"><span class="cc-label">CPD単位</span><span class="cc-value" style="color:#1D9E75;">6.0単位（自動付与）</span></div>
+        <div class="cc-row"><span class="cc-label">受付番号</span><span class="cc-value">2026-0614-0024</span></div>
+      </div>
+      <button class="home-btn" onclick="go('screen-home')">ホームに戻る</button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: COMPLETE2 ===== -->
+  <div class="screen" id="screen-complete2">
+    <div class="status-bar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="app-header"><div class="header-title">申込完了</div></div>
+    <div class="complete-body">
+      <div class="complete-icon">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="#3B6D11" stroke-width="1.5"/><polyline points="10,18 15.5,24 26,12" stroke="#3B6D11" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="complete-title">申込が完了しました</div>
+      <div class="complete-sub">受付完了メールを送信しました。<br>当日は会員証をご提示ください。</div>
+      <div class="complete-card">
+        <div class="cc-row"><span class="cc-label">講習会</span><span class="cc-value">監理技術者講習</span></div>
+        <div class="cc-row"><span class="cc-label">開催日</span><span class="cc-value">2026年7月5日（日）</span></div>
+        <div class="cc-row"><span class="cc-label">会場</span><span class="cc-value">北海道建設会館</span></div>
+        <div class="cc-row"><span class="cc-label">CPD単位</span><span class="cc-value" style="color:#1D9E75;">7.0単位（自動付与）</span></div>
+        <div class="cc-row"><span class="cc-label">受付番号</span><span class="cc-value">2026-0705-0033</span></div>
+      </div>
+      <button class="home-btn" onclick="go('screen-home')">ホームに戻る</button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: MEMBER CARD ===== -->
+  <div class="screen" id="screen-card">
+    <div class="status-bar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="app-header">
+      <div class="header-top">
+        <div class="back-btn" onclick="go('screen-home')">
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><polyline points="8,1 2,8 8,15" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div><div class="header-title">デジタル会員証</div></div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="member-card">
+        <div class="card-wm"></div>
+        <div class="card-org">一般社団法人 北海道建築士会</div>
+        <div class="card-name">山田 太郎</div>
+        <div class="card-name-en">TARO YAMADA</div>
+        <div class="card-div"></div>
+        <div class="card-grid">
+          <div><div class="cil">資格区分</div><div class="civ">一級建築士</div></div>
+          <div><div class="cil">登録番号</div><div class="civ">第 123456 号</div></div>
+          <div><div class="cil">支部</div><div class="civ">札幌支部</div></div>
+          <div><div class="cil">専攻建築士</div><div class="civ">構造・環境</div></div>
+        </div>
+        <div class="card-bot">
+          <div><div class="card-id-label">会員番号</div><div class="card-id-num">H-00042567</div></div>
+          <div class="valid-badge">2026年度 有効</div>
+        </div>
+      </div>
+      <div class="status-strip">
+        <div class="sdot"></div>
+        <div class="stext2">本人確認済 · リアルタイム検証対応</div>
+      </div>
+      <div class="qr-section">
+        <div class="qr-title">QRコードで提示</div>
+        <svg width="96" height="96" viewBox="0 0 96 96">
+          <rect x="4" y="4" width="36" height="36" rx="3" fill="none" stroke="#1B4F8A" stroke-width="2.5"/>
+          <rect x="12" y="12" width="20" height="20" rx="1.5" fill="#1B4F8A"/>
+          <rect x="56" y="4" width="36" height="36" rx="3" fill="none" stroke="#1B4F8A" stroke-width="2.5"/>
+          <rect x="64" y="12" width="20" height="20" rx="1.5" fill="#1B4F8A"/>
+          <rect x="4" y="56" width="36" height="36" rx="3" fill="none" stroke="#1B4F8A" stroke-width="2.5"/>
+          <rect x="12" y="64" width="20" height="20" rx="1.5" fill="#1B4F8A"/>
+          <rect x="56" y="56" width="6" height="6" fill="#1B4F8A"/>
+          <rect x="64" y="56" width="6" height="6" fill="#1B4F8A"/>
+          <rect x="72" y="56" width="6" height="6" fill="#1B4F8A"/>
+          <rect x="56" y="64" width="6" height="6" fill="#1B4F8A"/>
+          <rect x="72" y="64" width="6" height="6" fill="#1B4F8A"/>
+          <rect x="64" y="72" width="6" height="6" fill="#1B4F8A"/>
+          <rect x="80" y="72" width="6" height="6" fill="#1B4F8A"/>
+          <rect x="56" y="80" width="6" height="6" fill="#1B4F8A"/>
+          <rect x="72" y="80" width="6" height="6" fill="#1B4F8A"/>
+          <rect x="86" y="56" width="6" height="6" fill="#1B4F8A"/>
+          <rect x="80" y="64" width="6" height="6" fill="#1B4F8A"/>
+          <rect x="86" y="80" width="6" height="6" fill="#1B4F8A"/>
+        </svg>
+        <div class="qr-note">相手のスマートフォンで読み取ることで<br>会員情報をオンライン検証できます</div>
+      </div>
+      <div class="cpd-mini">
+        <div class="cpd-mini-label">今年度 CPD取得状況</div>
+        <div class="cpd-bar-wrap"><div class="cpd-bar-fill"></div></div>
+        <div class="cpd-nums"><span>取得 <b>31.5</b> 単位</span><span>目標 50単位</span></div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="go('screen-home')">
+        <svg viewBox="0 0 22 22" fill="none"><path d="M3 10.5L11 3L19 10.5V19H14V14H8V19H3V10.5Z" stroke="#aaa" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        <span>ホーム</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-workshops')">
+        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="14" rx="2" stroke="#aaa" stroke-width="1.4"/><line x1="3" y1="9" x2="19" y2="9" stroke="#aaa" stroke-width="1.4"/><rect x="6" y="13" width="4" height="3" rx="0.5" fill="#aaa"/></svg>
+        <span>講習会</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-cpd')">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#aaa" stroke-width="1.4"/><polyline points="7,11 10,14 15,8" stroke="#aaa" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>CPD</span>
+      </div>
+      <div class="nav-item active" onclick="go('screen-card')">
+        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="2" stroke="#1B4F8A" stroke-width="1.4"/><rect x="5" y="5" width="5" height="5" rx="0.5" fill="#1B4F8A"/><rect x="12" y="5" width="5" height="5" rx="0.5" fill="#1B4F8A"/><rect x="5" y="12" width="5" height="5" rx="0.5" fill="#1B4F8A"/><rect x="12" y="12" width="5" height="5" rx="0.5" fill="#1B4F8A"/></svg>
+        <span style="color:#1B4F8A;">会員証</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-mypage')">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="#aaa" stroke-width="1.4"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#aaa" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span>マイページ</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: CPD ===== -->
+  <div class="screen" id="screen-cpd">
+    <div class="status-bar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="app-header">
+      <div class="header-top">
+        <div class="back-btn" onclick="go('screen-home')">
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><polyline points="8,1 2,8 8,15" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div class="header-title">CPD記録</div>
+          <div class="header-sub">2026年度</div>
+        </div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="cpd-summary">
+        <div style="font-size:12px;opacity:0.75;margin-bottom:6px;">今年度取得単位</div>
+        <div><span class="cpd-big">31.5</span><span class="cpd-unit">単位</span></div>
+        <div class="cpd-goal">目標 50単位まで あと 18.5単位</div>
+        <div class="cpd-pbar-wrap"><div class="cpd-pbar-fill"></div></div>
+      </div>
+
+      <div class="sec-title">取得履歴</div>
+      <div class="cpd-record">
+        <div class="cpd-rec-head">
+          <div class="cpd-rec-title">建築基準法に基づく定期講習会（2025年度）</div>
+          <div class="cpd-pts">6.0<span> 単位</span></div>
+        </div>
+        <div class="cpd-rec-date">2025年11月15日</div>
+      </div>
+      <div class="cpd-record">
+        <div class="cpd-rec-head">
+          <div class="cpd-rec-title">監理技術者講習（2025年度）</div>
+          <div class="cpd-pts">7.0<span> 単位</span></div>
+        </div>
+        <div class="cpd-rec-date">2025年9月8日</div>
+      </div>
+      <div class="cpd-record">
+        <div class="cpd-rec-head">
+          <div class="cpd-rec-title">まちづくりシンポジウム2025</div>
+          <div class="cpd-pts">3.5<span> 単位</span></div>
+        </div>
+        <div class="cpd-rec-date">2025年7月20日</div>
+      </div>
+      <div class="cpd-record">
+        <div class="cpd-rec-head">
+          <div class="cpd-rec-title">構造設計者のための実践セミナー</div>
+          <div class="cpd-pts">6.0<span> 単位</span></div>
+        </div>
+        <div class="cpd-rec-date">2025年6月1日</div>
+      </div>
+      <div class="cpd-record">
+        <div class="cpd-rec-head">
+          <div class="cpd-rec-title">建築士定期講習（本部主催）</div>
+          <div class="cpd-pts">9.0<span> 単位</span></div>
+        </div>
+        <div class="cpd-rec-date">2025年4月19日</div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="go('screen-home')">
+        <svg viewBox="0 0 22 22" fill="none"><path d="M3 10.5L11 3L19 10.5V19H14V14H8V19H3V10.5Z" stroke="#aaa" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        <span>ホーム</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-workshops')">
+        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="14" rx="2" stroke="#aaa" stroke-width="1.4"/><line x1="3" y1="9" x2="19" y2="9" stroke="#aaa" stroke-width="1.4"/><rect x="6" y="13" width="4" height="3" rx="0.5" fill="#aaa"/></svg>
+        <span>講習会</span>
+      </div>
+      <div class="nav-item active" onclick="go('screen-cpd')">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#1B4F8A" stroke-width="1.4"/><polyline points="7,11 10,14 15,8" stroke="#1B4F8A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="color:#1B4F8A;">CPD</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-card')">
+        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="2" stroke="#aaa" stroke-width="1.4"/><rect x="5" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="5" y="12" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="12" width="5" height="5" rx="0.5" fill="#aaa"/></svg>
+        <span>会員証</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-mypage')">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="#aaa" stroke-width="1.4"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#aaa" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span>マイページ</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: NEWS ===== -->
+  <div class="screen" id="screen-news">
+    <div class="status-bar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="app-header">
+      <div class="header-top">
+        <div class="back-btn" onclick="go('screen-home')">
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><polyline points="8,1 2,8 8,15" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div><div class="header-title">会誌・ニュース</div></div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="sec-title">最新号</div>
+      <div class="ws-card" style="cursor:default;">
+        <div class="ws-head">
+          <span class="type-badge" style="background:#FBF5EE;color:#BA7517;">会誌</span>
+          <span style="font-size:10px;color:#E24B4A;background:#FCEBEB;padding:3px 10px;border-radius:20px;font-weight:600;">未読</span>
+        </div>
+        <div class="ws-title">建築士 2026年5月号</div>
+        <div class="ws-meta">
+          <div class="ws-meta-row">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="9" rx="1.2" stroke="#888" stroke-width="1"/><line x1="1" y1="5" x2="11" y2="5" stroke="#888" stroke-width="1"/></svg>
+            2026年3月31日 配信
+          </div>
+        </div>
+        <div style="margin-top:8px;">
+          <button class="apply-btn" style="font-size:11px;">PDFを開く</button>
+        </div>
+      </div>
+      <div class="sec-title" style="margin-top:8px;">支部ニュース STREET</div>
+      <div class="ws-card" style="cursor:default;">
+        <div class="ws-head">
+          <span class="type-badge" style="background:#EEF4FB;color:#1B4F8A;">支部ニュース</span>
+          <span style="font-size:10px;color:#E24B4A;background:#FCEBEB;padding:3px 10px;border-radius:20px;font-weight:600;">未読</span>
+        </div>
+        <div class="ws-title">STREET 2026年4月号</div>
+        <div class="ws-meta">
+          <div class="ws-meta-row">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="9" rx="1.2" stroke="#888" stroke-width="1"/><line x1="1" y1="5" x2="11" y2="5" stroke="#888" stroke-width="1"/></svg>
+            2026年3月25日 配信
+          </div>
+        </div>
+        <div style="margin-top:8px;">
+          <button class="apply-btn" style="font-size:11px;">PDFを開く</button>
+        </div>
+      </div>
+      <div class="ws-card" style="cursor:default;">
+        <div class="ws-head">
+          <span class="type-badge" style="background:#EEF4FB;color:#1B4F8A;">支部ニュース</span>
+        </div>
+        <div class="ws-title">STREET 2026年3月号</div>
+        <div class="ws-meta">
+          <div class="ws-meta-row">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="9" rx="1.2" stroke="#888" stroke-width="1"/><line x1="1" y1="5" x2="11" y2="5" stroke="#888" stroke-width="1"/></svg>
+            2026年2月25日 配信
+          </div>
+        </div>
+        <div style="margin-top:8px;">
+          <button class="apply-btn" style="font-size:11px;">PDFを開く</button>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="go('screen-home')">
+        <svg viewBox="0 0 22 22" fill="none"><path d="M3 10.5L11 3L19 10.5V19H14V14H8V19H3V10.5Z" stroke="#aaa" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        <span>ホーム</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-workshops')">
+        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="14" rx="2" stroke="#aaa" stroke-width="1.4"/><line x1="3" y1="9" x2="19" y2="9" stroke="#aaa" stroke-width="1.4"/><rect x="6" y="13" width="4" height="3" rx="0.5" fill="#aaa"/></svg>
+        <span>講習会</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-cpd')">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#aaa" stroke-width="1.4"/><polyline points="7,11 10,14 15,8" stroke="#aaa" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>CPD</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-card')">
+        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="2" stroke="#aaa" stroke-width="1.4"/><rect x="5" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="5" y="12" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="12" width="5" height="5" rx="0.5" fill="#aaa"/></svg>
+        <span>会員証</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-mypage')">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="#aaa" stroke-width="1.4"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#aaa" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span>マイページ</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: MY PAGE ===== -->
+  <div class="screen" id="screen-mypage">
+    <div class="status-bar"><span>9:41</span><span>●●● 100%</span></div>
+    <div class="app-header">
+      <div class="header-top">
+        <div class="back-btn" onclick="go('screen-home')">
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><polyline points="8,1 2,8 8,15" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div><div class="header-title">マイページ</div></div>
+      </div>
+    </div>
+    <div class="body">
+      <div style="display:flex;align-items:center;gap:14px;background:#fff;border-radius:14px;border:0.5px solid #D6E4F4;padding:16px;margin-bottom:14px;">
+        <div style="width:52px;height:52px;border-radius:50%;background:#EEF4FB;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#1B4F8A;">山</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#1a1a1a;">山田 太郎</div>
+          <div style="font-size:11px;color:#888;margin-top:2px;">一級建築士 · 札幌支部</div>
+          <div style="font-size:11px;color:#1B4F8A;margin-top:2px;font-weight:600;">H-00042567</div>
+        </div>
+      </div>
+      <div class="sec-title">登録情報</div>
+      <div class="cpd-record" style="margin-bottom:8px;">
+        <div class="cc-row"><span class="cc-label">メールアドレス</span><span class="cc-value" style="font-size:11px;">yamada@example.com</span></div>
+        <div class="cc-row"><span class="cc-label">電話番号</span><span class="cc-value">011-XXX-XXXX</span></div>
+        <div class="cc-row"><span class="cc-label">事務所名</span><span class="cc-value" style="font-size:11px;">山田建築設計事務所</span></div>
+        <div class="cc-row" style="border-bottom:none;"><span class="cc-label">会員種別</span><span class="cc-value">正会員</span></div>
+      </div>
+      <div class="sec-title">設定</div>
+      <div class="notif-item" style="cursor:pointer;">
+        <div style="flex:1;"><div class="ntitle">プッシュ通知の設定</div></div>
+        <svg width="8" height="13" viewBox="0 0 8 13" fill="none"><polyline points="1,1 7,6.5 1,12" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="notif-item" style="cursor:pointer;">
+        <div style="flex:1;"><div class="ntitle">パスワード変更</div></div>
+        <svg width="8" height="13" viewBox="0 0 8 13" fill="none"><polyline points="1,1 7,6.5 1,12" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="notif-item" style="cursor:pointer;">
+        <div style="flex:1;"><div class="ntitle">ログアウト</div></div>
+        <svg width="8" height="13" viewBox="0 0 8 13" fill="none"><polyline points="1,1 7,6.5 1,12" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="text-align:center;margin-top:16px;font-size:10px;color:#bbb;">h-ab Connect v1.0.0-prototype</div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="go('screen-home')">
+        <svg viewBox="0 0 22 22" fill="none"><path d="M3 10.5L11 3L19 10.5V19H14V14H8V19H3V10.5Z" stroke="#aaa" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        <span>ホーム</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-workshops')">
+        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="14" rx="2" stroke="#aaa" stroke-width="1.4"/><line x1="3" y1="9" x2="19" y2="9" stroke="#aaa" stroke-width="1.4"/><rect x="6" y="13" width="4" height="3" rx="0.5" fill="#aaa"/></svg>
+        <span>講習会</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-cpd')">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#aaa" stroke-width="1.4"/><polyline points="7,11 10,14 15,8" stroke="#aaa" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>CPD</span>
+      </div>
+      <div class="nav-item" onclick="go('screen-card')">
+        <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="2" stroke="#aaa" stroke-width="1.4"/><rect x="5" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="5" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="5" y="12" width="5" height="5" rx="0.5" fill="#aaa"/><rect x="12" y="12" width="5" height="5" rx="0.5" fill="#aaa"/></svg>
+        <span>会員証</span>
+      </div>
+      <div class="nav-item active" onclick="go('screen-mypage')">
+        <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="#1B4F8A" stroke-width="1.4"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#1B4F8A" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span style="color:#1B4F8A;">マイページ</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function go(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(screenId);
+    if (target) {
+      target.classList.add('active');
+      target.querySelector('.body') && (target.querySelector('.body').scrollTop = 0);
+    }
+  }
+  function toggleRadio(el) {
+    el.closest('.radio-group').querySelectorAll('.radio-item').forEach(r => {
+      r.classList.remove('selected');
+      r.querySelector('.rdot').style.borderColor = '#ccc';
+      r.querySelector('.rdot').style.background = 'transparent';
+    });
+    el.classList.add('selected');
+    el.querySelector('.rdot').style.borderColor = '#1B4F8A';
+    el.querySelector('.rdot').style.background = '#1B4F8A';
+  }
+</script>
+</body>
+</html>
